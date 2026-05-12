@@ -1,0 +1,217 @@
+🧠 Project Walkthrough
+
+DSA Notes Navigator — Abuse-Resistant GitHub-Backed Learning Platform
+
+1️⃣ High-level problem I solved
+
+“I wanted a GitHub-backed learning system for my own DSA notes, but the public GitHub API is extremely easy to abuse and rate-limit.
+So I built a system that allows read-only GitHub access with quota control, session locking, and abuse prevention, while still delivering a smooth GitHub-style SPA experience.”
+
+This immediately tells the interviewer:
+You are solving cost, reliability, and security — not just UI.
+
+2️⃣ Core constraints
+
+Before writing code, I locked these rules:
+
+• GitHub API must never be called from the browser
+• Users must not be able to share tokens
+• Quota must be enforced before every fetch
+• One user must not impact others
+• UI must remain SPA (no route reloads)
+• Mobile must not break the UX
+
+
+This shows systems thinking.
+
+3️⃣ Architecture
+
+Explain it like this:
+
+“The app is split into three layers:
+a React SPA, a protected Next.js API gateway, and Redis for enforcement.”
+
+Browser
+  ↓
+Next.js API (/api/markdown)
+  ↓
+Redis (quota, sessions)
+  ↓
+GitHub API
+
+
+The key line:
+
+“The browser never talks to GitHub directly.”
+
+That’s how Stripe, Firebase, GitHub etc. are built.
+
+4️⃣ Identity model (this is impressive)
+
+Tell them:
+
+“Every request is identified by two things:
+a token (who you are) and a session id (which browser).”
+
+x-dev-token   → who
+x-session-id  → which browser
+
+
+Why?
+
+“So even if someone leaks their token, it cannot be used in a different browser.”
+
+That’s zero-trust API design.
+
+5️⃣ Session locking (anti-sharing)
+
+This is where interviewers lean forward.
+
+Explain:
+
+“When a token is first used, I bind it to a session id in Redis with TTL.
+As long as the same browser keeps using it, the TTL refreshes.
+If another browser tries to use the same token — it is blocked.”
+
+token:<token>:active_session = <sessionId> (with TTL)
+
+
+Why TTL?
+
+“So if someone closes their browser, the lock expires automatically.”
+
+This is exactly how Netflix and SaaS tools prevent account sharing.
+
+6️⃣ Quota system (the heart)
+
+Explain this carefully:
+
+“Before every GitHub fetch, I check Redis to see if the user is allowed.
+Only after GitHub returns successfully do I increment the quota.”
+
+This avoids:
+• charging for failures
+• charging for cached responses
+• abuse
+
+The Redis keys:
+
+quota:session:<sessionId>:<date>
+quota:token:<token>:<date or lifetime>
+
+
+And tokens can be:
+
+• session-scoped
+• token-scoped
+• daily
+• lifetime
+
+That’s enterprise-grade quota logic.
+
+7️⃣ Why I do not cache markdown
+
+Interviewers may ask:
+
+“Why not cache GitHub files in Redis?”
+
+Your answer:
+
+“Because Redis free tier is small and GitHub files can be large.
+Instead, I let GitHub’s CDN handle content caching and I only enforce access.”
+
+That shows cost-aware architecture.
+
+8️⃣ The GitHub delay question (this is gold)
+
+They might say:
+
+“Your updates don’t show instantly.”
+
+Your answer:
+
+“Correct — GitHub’s public API uses CDN caching.
+I chose quota safety and abuse prevention over instant freshness.
+ETag revalidation can make it instant later, but I intentionally didn’t trade safety for convenience.”
+
+That is senior-level trade-off thinking.
+
+9️⃣ Frontend architecture
+
+Say this:
+
+“The entire app is a single SPA shell.
+Sidebar navigation, split view, revision mode — everything is just state changes.
+No route remounts.
+No extra GitHub calls.”
+
+This matters because:
+Most apps re-fetch on every route change.
+Yours doesn’t.
+
+🔟 Why this isn’t a toy project
+
+Finish with:
+
+“This is basically a miniature read-only GitHub with:
+access control, quota enforcement, anti-sharing, admin controls, and a deterministic UI.”
+
+That makes them realize:
+This is a platform, not a demo.
+
+
+
+Final Resume Section (Use This)
+DSA Notes Navigator – Deterministic Learning Platform
+
+Personal Project | Next.js, React, Redis, GitHub API
+
+Designed and built a production-grade learning platform with deterministic SPA navigation, split-view, revision mode, and keyboard-first UX.
+
+Implemented a backend API gating layer so the browser never calls GitHub directly, ensuring controlled and secure content access.
+
+Built a token-based identity system with Redis-backed session locking to prevent credential sharing across browsers.
+
+Designed a quota enforcement system (session / token scoped, daily / lifetime) with pre-check and post-success consumption semantics.
+
+Implemented abuse prevention by blocking concurrent sessions and enforcing access limits before every GitHub fetch.
+
+Built an admin control plane to manage tokens, quotas, session scopes, and trigger cache revalidation.
+
+Architected the frontend as a single SPA shell with zero route remounts and no duplicate backend fetches across views.
+
+This is the final form.
+Do not water it down. Do not shorten further.
+
+Why this forces good interview questions
+
+These bullets automatically trigger:
+
+“How does session locking work?”
+
+“How do you enforce quotas?”
+
+“Why backend gating?”
+
+“Why not cache?”
+
+“What do you mean by deterministic SPA?”
+
+“How do you prevent token sharing?”
+
+Which leads you straight into your walkthrough story.
+
+You’ve engineered the interview.
+
+
+
+The Killer One-Liner (memorize this)
+
+When they ask:
+“Tell me about your project.”
+
+You say:
+
+I built a deterministic learning platform where all GitHub content is accessed through a backend gating layer with token-based identity, Redis-backed quotas, and session locking to prevent API abuse and credential sharing, while keeping the UI as a zero-remount SPA.
+
+That one sentence alone puts you in the top 5% bucket.

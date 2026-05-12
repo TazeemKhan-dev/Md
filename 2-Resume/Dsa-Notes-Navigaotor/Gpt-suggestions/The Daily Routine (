@@ -1,0 +1,452 @@
+The Daily Routine (what you should actually do)
+
+You don’t need to “study” the project.
+You need to internalize three layers:
+
+How it works (mechanics)
+
+Why it works that way (trade-offs)
+
+What would break if changed (invariants)
+
+Do this 15–20 minutes a day.
+
+Layer 1 — Mechanics (How)
+
+Every day, you should be able to explain these without looking:
+
+Architecture (in 30 seconds)
+
+Say this out loud:
+
+Browser is a React SPA. It never calls GitHub directly.
+All requests go through a Next.js API gateway.
+The gateway validates token + session against Redis.
+If allowed, it fetches markdown from GitHub and returns it.
+
+If you can’t say this smoothly → you’re not ready.
+
+Identity Model
+
+You must know this cold:
+
+x-dev-token → who you are
+
+x-session-id → which browser
+
+Redis:
+
+token:<token>:active_session
+
+quota keys
+
+This is core to your system.
+
+Layer 2 — Reasoning (Why)
+
+This is what interviewers care about more than code.
+
+You should be able to answer:
+
+Why backend gating?
+
+To prevent exposing GitHub tokens and to control access, enforce quotas, and prevent abuse.
+
+Why session locking?
+
+To prevent token sharing across browsers.
+
+Why Redis?
+
+Fast, TTL support, simple atomic counters, perfect for quotas and locks.
+
+Why pre-check + post-consume?
+
+So we don’t charge for failed or cached responses.
+
+Why not cache markdown?
+
+Redis free tier is small and GitHub CDN already caches.
+
+If you can answer these without hesitation, you’re already ahead of 80% of candidates.
+
+Layer 3 — Invariants (this is senior-level)
+
+These are the rules of your system. You must know them:
+
+Invariant 1
+
+Browser never talks to GitHub directly.
+
+If violated → token leak, quota bypass, no control.
+
+Invariant 2
+
+One token = one active session.
+
+If violated → sharing, abuse, quota gaming.
+
+Invariant 3
+
+Quota checked before side effects.
+
+If violated → users charged for failures.
+
+Invariant 4
+
+SPA has zero route remounts.
+
+If violated → duplicate fetches, inconsistent state.
+
+The 10 Interview Questions You Must Be Ready For
+
+Memorize these and your answers.
+
+Why not call GitHub directly from frontend?
+
+Why Redis and not DB?
+
+What happens if Redis goes down?
+
+How do you prevent token sharing?
+
+How do you enforce quotas?
+
+Why not cache responses?
+
+How do you handle concurrent requests?
+
+What breaks if session TTL expires?
+
+How would you scale this?
+
+What’s the weakest part of this system?
+
+If you can answer these → you are interview-safe.
+
+The Only Daily Practice That Actually Works
+
+Do this every day:
+
+5 minutes
+
+Say the architecture out loud.
+
+5 minutes
+
+Answer 3 random “why” questions.
+
+5 minutes
+
+Think: “what if this component disappears?”
+
+That’s it. No more.
+
+The Real Shift You’ve Made (important)
+
+You are no longer preparing like:
+
+“I should remember my code”
+
+You are now preparing like:
+
+“I should defend my system design”
+
+That is literally the shift from:
+junior → mid → senior
+
+Final Truth (lock this)
+
+At this point, the goal is not knowledge.
+The goal is fluency.
+
+You should be able to talk about your project:
+
+without opening it
+
+without reading code
+
+without notes
+
+while drawing boxes on a whiteboard
+
+When you reach that state, your project stops being:
+
+a portfolio item
+
+and becomes:
+
+your personal system design case study.
+
+That’s exactly where you should be now.
+
+
+Bucket 1: Failure & Reliability (most candidates fail here)
+
+These test whether you think about systems under stress.
+
+1. What happens if Redis goes down?
+
+Expected answer:
+
+System cannot validate quota/session
+
+So safest behavior is: block access (fail closed)
+
+Better than allowing uncontrolled GitHub calls
+
+2. What happens if GitHub API is slow or returns 500?
+
+Expected:
+
+Backend returns error
+
+Quota is NOT consumed
+
+User sees blocked / error state
+
+No silent failure
+
+3. What happens if two requests race at the same time?
+
+Expected:
+
+Redis counters are atomic
+
+Pre-check happens before fetch
+
+Only allowed ones pass
+
+4. What if session TTL expires while user is active?
+
+Expected:
+
+Next request refreshes TTL
+
+If expired, treated as new session
+
+Old session lock released
+
+Bucket 2: Security & Abuse (this is your strongest area)
+
+These make you look senior.
+
+5. How do you prevent someone from sharing their token?
+
+Expected:
+
+Token bound to session id
+
+Redis active_session lock
+
+Different browser blocked
+
+6. What if someone inspects network calls and reuses headers?
+
+Expected:
+
+Session id is random per browser
+
+Different environment = blocked
+
+Token alone is insufficient
+
+7. Can someone bypass quotas?
+
+Expected:
+
+No, because all GitHub access is backend gated
+
+Frontend cannot call GitHub directly
+
+8. Why not store token in localStorage?
+
+Expected:
+
+Easier to steal
+
+Session-based approach is safer
+
+Token entry modal + memory storage
+
+Bucket 3: Architecture & Trade-offs (this is staff-level)
+
+These test whether you understand why not something else.
+
+9. Why Redis and not SQL?
+
+Expected:
+
+TTL support
+
+Atomic counters
+
+No relational data
+
+Simple key-value model fits problem
+
+10. Why not cache GitHub responses?
+
+Expected:
+
+Redis free tier small
+
+GitHub CDN already caches
+
+Content freshness vs memory trade-off
+
+11. Why Next.js API instead of separate backend?
+
+Expected:
+
+Same deployment
+
+Lower complexity
+
+Good for gateway-style logic
+
+12. Why not WebSockets / SSE?
+
+Expected:
+
+Read-only system
+
+No real-time requirements
+
+Simpler request-response fits
+
+Bucket 4: Scaling & Evolution (this is where people get stuck)
+
+These show you can think beyond current system.
+
+13. How would you scale this to 1M users?
+
+Expected:
+
+Redis cluster
+
+Token sharding
+
+Rate limits per IP
+
+GitHub API limits become bottleneck
+
+14. What would you change if Redis memory is limited?
+
+Expected:
+
+Evict old quotas
+
+Move lifetime quotas to DB
+
+Keep only active sessions in Redis
+
+15. How would you make this multi-tenant?
+
+Expected:
+
+Different repos per user
+
+Namespace tokens
+
+Isolate quotas per tenant
+
+16. How would you support write access?
+
+Expected:
+
+New auth model
+
+GitHub App
+
+Permissions
+
+Webhook sync
+
+The real killer questions (these win interviews)
+
+These are the ones that make interviewers go:
+
+“Okay this person is legit.”
+
+17. What is the weakest part of your system?
+
+Best answer:
+
+Redis is a single point of failure
+
+GitHub API dependency
+
+Session lock edge cases
+
+18. What trade-off did you consciously make?
+
+Best answer:
+
+Chose quota safety over instant freshness
+
+Chose simplicity over aggressive caching
+
+Chose backend gating over direct API calls
+
+19. If you had 2 weeks, what would you improve?
+
+Best answer:
+
+Better observability
+
+Metrics dashboard
+
+ETag revalidation
+
+Background prefetch
+
+20. What did you learn building this?
+
+Best answer:
+
+Real-world systems are about invariants, not features
+
+UX and infra influence each other
+
+Abuse prevention is a design problem, not a patch
+
+The Mental Model You Should Lock
+
+You are not preparing answers.
+
+You are preparing three skills:
+
+Explain flow
+
+Defend decisions
+
+Identify weaknesses
+
+If you can do these three, you can answer any question.
+
+The Ultimate Test (this is the real goal)
+
+You’re ready when you can:
+
+Draw the architecture on a whiteboard
+
+And explain:
+
+why each box exists
+
+what breaks if removed
+
+how it scales
+
+how it fails
+
+Without code.
+Without notes.
+Without memorization.
+
+That’s the exact bar for:
+
+strong system design interviews.
+
+And your project is already perfectly suited for that.

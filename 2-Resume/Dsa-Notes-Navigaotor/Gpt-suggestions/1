@@ -1,0 +1,188 @@
+1. How recruiters will misread this (if you’re not careful)
+
+If you write:
+
+Built a GitHub-style Markdown Navigator using Next.js and React.
+
+They will think:
+
+CRUD app
+
+API fetch
+
+Sidebar
+
+Some markdown rendering
+
+Basically: junior project.
+
+This would be a tragedy for this system.
+
+2. The real value of your project (what it actually proves)
+
+Your project demonstrates senior-level signals:
+
+Systems Thinking
+
+API quota protection
+
+Deterministic behavior
+
+Session locking
+
+Anti-sharing mechanisms
+
+Identity model
+
+Admin control plane
+
+Frontend Architecture
+
+Zero remount SPA
+
+Single scroll container
+
+State-driven navigation
+
+No duplicate fetches
+
+Split view with shared state
+
+Keyboard-first UX
+
+Backend Discipline
+
+Token-based identity
+
+Redis TTL models
+
+Quota counters
+
+Pre-check before side effects
+
+Idempotent gating layer
+
+This is not a UI project.
+This is a distributed system with a UI.
+
+3. How to name the project (this matters a lot)
+
+Never call it:
+
+“Markdown viewer”
+
+“GitHub clone”
+
+“DSA notes app”
+
+Call it something like:
+
+DSA Notes Navigator – A quota-safe, session-locked learning platform
+
+or
+
+Deterministic Learning Platform with GitHub-backed content
+
+Names should signal system, not tool.
+
+4. Resume bullet points (this is the core)
+
+This is the level you should write at:
+
+Project: DSA Notes Navigator (Personal Project)
+
+Wrong (junior):
+
+Built a markdown viewer using Next.js and React.
+
+Implemented sidebar navigation and search.
+
+Correct (your level):
+
+Designed and built a production-grade learning platform with deterministic SPA navigation, supporting split-view, revision mode, and keyboard-first UX.
+
+Implemented a token-based access control system with Redis-backed quota enforcement and session locking to prevent API abuse and credential sharing.
+
+Built a backend gating layer for all GitHub API calls, ensuring pre-check quota validation and post-success consumption semantics.
+
+Designed an admin control plane to manage tokens, quotas, session scopes, and trigger cache revalidation.
+
+Architected a single-scroll-container SPA with zero route remounts and shared state across split panes.
+
+Implemented TOC synchronization and active section tracking using custom markdown parsing.
+
+Ensured no duplicate backend fetches across split views via centralized state and request deduplication.
+
+These bullets scream: “this person thinks in systems”.
+
+5. What to show in portfolio (not everything)
+
+When a recruiter opens your link, they should see:
+
+1. A short landing explanation (10 lines max)
+
+Something like:
+
+This is a production-grade learning platform for navigating and revising DSA notes, inspired by GitHub’s UI but optimized for deterministic behavior, API quota safety, and session-locked access.
+
+It demonstrates system-level engineering including token-based identity, Redis-backed quotas, backend API gating, and zero-remount SPA architecture.
+
+Not:
+“Welcome to my markdown app”.
+
+2. One diagram (this is gold)
+
+Even a simple one:
+
+Browser
+  ↓
+Token + Session
+  ↓
+Backend API Gate
+  ↓
+Redis (quota + session lock)
+  ↓
+GitHub API
+
+
+Recruiters LOVE diagrams. It proves design thinking.
+
+6. How this positions you vs others
+
+Most candidates show:
+
+Todo apps
+
+CRUD dashboards
+
+E-commerce clones
+
+Chat apps
+
+You are showing:
+
+Quota systems
+
+Session locking
+
+Deterministic SPAs
+
+Admin control planes
+
+API abuse prevention
+
+That puts you in the mental bucket of:
+
+“This person can work on real products, not just features.”
+
+7. The killer one-liner for interviews
+
+When they ask:
+
+“Tell me about your best project”
+
+Your answer:
+
+I built a production-grade learning platform where all content is fetched from GitHub but protected by a backend gating layer with token-based identity, Redis-backed quotas, and session locking to prevent API exhaustion and credential sharing. The frontend is a deterministic SPA with zero remounts, split-view learning, and keyboard-first navigation.
+
+That sentence alone is senior-coded.

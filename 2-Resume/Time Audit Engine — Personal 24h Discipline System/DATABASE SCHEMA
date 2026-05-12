@@ -1,0 +1,128 @@
+🧱 1️⃣ time_blocks
+{
+  _id: ObjectId,
+  date: string, // "YYYY-MM-DD"
+  
+  startMinutes: number,
+  endMinutes: number,
+  durationMinutes: number,
+  
+  categoryId: ObjectId,
+  note?: string,
+  source: "manual" | "timer",
+  
+  createdAt: Date,
+  updatedAt: Date
+}
+
+
+Index:
+
+{ date: 1, startMinutes: 1 }
+
+🗓 2️⃣ days
+{
+  _id: string, // date string
+
+  totalLoggedMinutes: number,
+  totalUntrackedMinutes: number,
+  totalProductiveMinutes: number,
+  totalNeutralMinutes: number,
+  totalWasteMinutes: number,
+
+  isCompleted: boolean,
+
+  createdAt: Date,
+  updatedAt: Date
+}
+
+
+Index:
+
+_id (already indexed)
+
+🗂 3️⃣ categories
+{
+  _id: ObjectId,
+  name: string,
+  type: "productive" | "neutral" | "waste",
+  isActive: boolean,
+  createdAt: Date,
+  updatedAt: Date
+}
+
+
+Unique index on name.
+
+⚙️ 4️⃣ settings
+{
+  _id: "global",
+
+  strictMode: boolean,
+  autoPrefillNext: boolean,
+  minBlockMinutes: number
+}
+
+
+Single document.
+
+Good.
+
+Option A (auto-create day on first block) is correct.
+
+Now about daily planner integration.
+
+Let me answer properly — not emotionally.
+
+🧠 First: Should Planner Be Integrated?
+
+Short answer:
+Yes.
+But only if done correctly.
+
+If you mix planner and tracker carelessly,
+you create chaos.
+
+If you structure it properly,
+you create something extremely powerful:
+
+Planned vs Actual Time Intelligence
+
+That is next-level.
+
+🎯 What You’re Actually Building Now
+
+Not just:
+
+Time tracker
+
+But:
+
+Execution vs Planning Engine.
+
+🔥 Architecture Upgrade (Clean Way)
+
+We do NOT mix planner into time_blocks.
+
+We create a new collection.
+
+🗂 Collection: plans
+{
+  _id: ObjectId,
+
+  date: "YYYY-MM-DD",
+
+  title: string,
+  description?: string,
+
+  plannedMinutes?: number,   // optional expected duration
+
+  categoryId?: ObjectId,     // optional link to category
+
+  priority: "low" | "medium" | "high",
+
+  status: "pending" | "done" | "migrated",
+
+  createdAt: Date,
+  updatedAt: Date
+}

@@ -1,0 +1,289 @@
+🎯 PROJECT NAME
+
+Time Audit Engine — Personal 24h Discipline & Planning System
+
+🎯 CORE GOAL
+
+Build a production-grade, single-user, deterministic daily time tracking + planning system that:
+
+Enforces full 24-hour accountability
+
+Detects time gaps
+
+Categorizes time by productivity type
+
+Integrates time-bound daily planning
+
+Compares planned vs actual execution
+
+Generates live, server-confirmed reports
+
+Supports strict mode enforcement
+
+Remains MongoDB free-tier safe
+
+This is NOT a habit tracker.
+This is a Planning + Execution Intelligence Engine.
+
+🧱 CORE PRINCIPLES
+
+Day = 00:00 → 24:00 (1440 minutes)
+
+Every minute must be accounted for (execution layer).
+
+Plans and execution are separate layers.
+
+Gaps are detected automatically.
+
+No overlapping blocks allowed.
+
+Reports update only after server confirmation.
+
+Strict Mode prevents closing incomplete days.
+
+Micro-block support (minimum 1 minute).
+
+Planner supports time-bound tasks.
+
+🗂 DATABASE STRUCTURE (MongoDB)
+1️⃣ Collection: time_blocks
+
+Reality layer.
+
+{
+  _id,
+  date: "YYYY-MM-DD",
+  startMinutes: Number,
+  endMinutes: Number,
+  durationMinutes: Number,
+  categoryId: ObjectId,
+  note: String,
+  source: "manual" | "timer",
+  createdAt
+}
+
+
+Rules:
+
+start < end
+
+no overlap
+
+duration = end - start (server-calculated only)
+
+2️⃣ Collection: days
+
+Daily summary layer.
+
+{
+  _id: "YYYY-MM-DD",
+
+  totalLoggedMinutes,
+  totalUntrackedMinutes,
+  totalProductiveMinutes,
+  totalNeutralMinutes,
+  totalWasteMinutes,
+
+  isCompleted: Boolean,
+
+  createdAt,
+  updatedAt
+}
+
+
+Auto-created when first block inserted.
+
+Used for:
+
+Strict Mode
+
+Daily report
+
+Completion locking
+
+3️⃣ Collection: categories
+{
+  _id,
+  name,
+  type: "productive" | "neutral" | "waste",
+  isActive: true,
+  createdAt
+}
+
+4️⃣ Collection: settings
+
+Single document.
+
+{
+  strictMode: true,
+  autoPrefillNext: true,
+  minBlockMinutes: 1
+}
+
+5️⃣ Collection: plans ✅ NEW
+
+Planning layer.
+
+{
+  _id,
+
+  date: "YYYY-MM-DD",
+
+  title: String,
+  description?: String,
+
+  categoryId?: ObjectId,
+
+  plannedMinutes: Number,   // expected duration
+
+  priority: "low" | "medium" | "high",
+
+  status: "pending" | "done" | "migrated",
+
+  createdAt,
+  updatedAt
+}
+
+
+Important:
+
+Plans do NOT auto-create time blocks.
+
+Plans represent intention.
+Time blocks represent reality.
+
+🔄 PLAN vs EXECUTION INTELLIGENCE
+
+Now system can compute:
+
+Planned DSA Minutes
+Actual DSA Minutes
+Deviation
+
+Example:
+
+Planned: 180 min
+Actual: 120 min
+Deviation: -60 min
+
+This is powerful.
+
+📊 UPDATED REPORT STRUCTURE
+
+Report now has two layers:
+
+1️⃣ Execution Report (same as before)
+
+Category | Type | Total Minutes | % of Day
+
+Metrics:
+
+Total Logged
+
+Untracked
+
+Productive
+
+Waste
+
+Neutral
+
+Focus Ratio
+
+2️⃣ Planning vs Actual Report (NEW)
+
+Category | Planned | Actual | Difference
+
+Or per-task comparison.
+
+🖥 UPDATED UI STRUCTURE
+
+Now you asked:
+
+Where are we showing this? New tab?
+
+Here is the clean structure:
+
+Page 1 — Dashboard (Main Page)
+
+Tabs at top:
+
+[ Today Log ]
+[ Today Plan ]
+[ Tomorrow Plan ]
+
+Not separate routes.
+Tabs inside same page.
+
+Because:
+You want daily flow, not navigation friction.
+
+🟢 Today Log
+
+Manual Entry
+
+Timer
+
+Today Blocks Table
+
+Gap Display
+
+Daily Summary Banner
+
+🔵 Today Plan
+
+Add Task
+
+Assign category
+
+Set plannedMinutes
+
+Mark done
+
+Migrate to tomorrow
+
+View total planned minutes
+
+Show total actual minutes for that category
+
+🟡 Tomorrow Plan
+
+Same as Today Plan,
+but for next date.
+
+At midnight:
+Tomorrow automatically becomes Today.
+
+Page 2 — Reports
+
+Daily Execution Report
+
+Weekly Execution Report
+
+Planning vs Actual
+
+Top 3 Categories
+
+Page 3 — Admin
+
+Manage:
+
+Categories
+
+Strict Mode
+
+Prefill toggle
+
+Min block duration
+
+🔐 STRICT MODE + PLANNER INTERACTION
+
+Strict Mode affects only execution.
+
+Planner does NOT block day closing.
+
+Because:
+You may fail plan.
+But you must log reality.
+
+Reality > Plan.

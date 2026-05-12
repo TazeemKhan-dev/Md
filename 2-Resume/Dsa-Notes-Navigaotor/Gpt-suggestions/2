@@ -1,0 +1,59 @@
+1. Resume bullets (primary)
+
+This is where 80% of understanding happens.
+
+These bullets already solve your problem:
+
+Implemented a token-based access control system with Redis-backed quota enforcement and session locking to prevent API abuse and credential sharing.
+
+Designed a backend API gating layer that validates quotas before GitHub requests and consumes them only after successful responses.
+
+Built an admin control plane to manage tokens, quotas, session scopes, and trigger cache revalidation.
+
+They don’t need to see it.
+They just need to know you built it.
+
+2. Portfolio landing (this is where you reveal the magic)
+
+Add a short section like:
+
+System Capabilities (Behind the Scenes)
+
+Token-based identity system with session locking
+
+Redis-backed quota enforcement (daily / lifetime scopes)
+
+Backend gating for all GitHub API calls
+
+Admin dashboard for token lifecycle management
+
+Deterministic SPA navigation with zero route remounts
+
+This makes the recruiter go:
+
+“Oh… this is not just a UI project.”
+
+3. One diagram (this is the killer move)
+
+Add a single diagram image:
+
+User Browser
+   ↓ (x-dev-token, x-session-id)
+Backend API Gate
+   ↓
+Redis
+  - active_session
+  - quota counters
+   ↓
+GitHub API
+
+
+This alone communicates:
+
+system thinking
+
+infra awareness
+
+production mindset
+
+Most candidates don’t even know how to draw this.
